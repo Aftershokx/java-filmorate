@@ -241,7 +241,7 @@ class FilmorateApplicationTests {
         NestedServletException exception = assertThrows (NestedServletException.class, () ->
                 putWithBadRequest (film, FILMS_PATH));
 
-        String expectedMessage = "Произошла ошибка при обновлении фильма, введите корректные данные";
+        String expectedMessage = "Произошла ошибка при обновлении фильма, фильм с таким ИД не существует";
         String actualMessage = exception.getMessage ();
         if (actualMessage != null) {
             assertTrue (actualMessage.contains (expectedMessage));
@@ -286,7 +286,7 @@ class FilmorateApplicationTests {
         NestedServletException exception = assertThrows (NestedServletException.class, () ->
                 putWithBadRequest (user, USERS_PATH));
 
-        String expectedMessage = "Произошла ошибка при обновлении пользователя, введите корректные данные";
+        String expectedMessage = "Произошла ошибка при обновлении пользователя, пользователь с таким ИД не существует";
         String actualMessage = exception.getMessage ();
         if (actualMessage != null) {
             assertTrue (actualMessage.contains (expectedMessage));
