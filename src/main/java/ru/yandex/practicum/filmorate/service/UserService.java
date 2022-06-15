@@ -33,20 +33,20 @@ public class UserService {
 
     public User create (User user) throws ValidationException {
         if (validationForUser (user)) {
-            userStorage.createUser (user);
+            userStorage.create (user);
         }
         return user;
     }
 
     public User put (User user) throws ValidationException {
         if (validationForUser (user)) {
-            userStorage.updateUser (user);
+            userStorage.update (user);
         }
         return user;
     }
 
     public void removeUser (User user) throws NotFoundException {
-        userStorage.deleteUser (user.getId ());
+        userStorage.delete (user.getId ());
     }
 
     public User getUserById (int id) throws NotFoundException {

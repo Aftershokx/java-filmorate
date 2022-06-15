@@ -22,7 +22,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     private final IdUpdater idUpdater = new IdUpdater ();
 
     @Override
-    public void createFilm (Film film) {
+    public void create (Film film) {
         if (films.containsKey (film.getId ())) {
             throw new ValidationException ("Произошла ошибка при создании фильма, фильм с таким ИД уже существует");
         } else {
@@ -33,7 +33,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void updateFilm (Film film) throws NotFoundException {
+    public void update (Film film) throws NotFoundException {
         if (!films.containsKey (film.getId ())) {
             throw new NotFoundException
                     ("Произошла ошибка при обновлении фильма, фильм с таким ИД не существует");
@@ -44,7 +44,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void deleteFilm (int id) throws NotFoundException {
+    public void delete (int id) throws NotFoundException {
         if (!films.containsKey (id)) {
             throw new NotFoundException ("Произошла ошибка при удалении фильма с ИД " + id +
                     ", фильм с таким ИД не существует ");

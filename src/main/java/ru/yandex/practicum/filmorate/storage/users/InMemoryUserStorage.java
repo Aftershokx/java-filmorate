@@ -22,7 +22,7 @@ public class InMemoryUserStorage implements UserStorage {
     private final IdUpdater idUpdater = new IdUpdater ();
 
     @Override
-    public void createUser (User user) {
+    public void create (User user) {
         if (users.containsKey (user.getId ())) {
             throw new ValidationException
                     ("Произошла ошибка при создании пользователя, пользователь с таким ИД уже существует");
@@ -34,7 +34,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void deleteUser (int id) throws NotFoundException {
+    public void delete (int id) throws NotFoundException {
         if (!users.containsKey (id)) {
             throw new NotFoundException ("Произошла ошибка при удалении пользователя, пользователь с таким ИД не существует");
         } else {
@@ -62,7 +62,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void updateUser (User user) throws NotFoundException {
+    public void update (User user) throws NotFoundException {
         if (!users.containsKey (user.getId ())) {
             throw new NotFoundException ("Произошла ошибка при обновлении пользователя, пользователь с таким ИД не существует");
         } else {

@@ -36,20 +36,20 @@ public class FilmService {
 
     public Film create (Film film) throws ValidationException {
         if (validationForFilm (film)) {
-            filmStorage.createFilm (film);
+            filmStorage.create (film);
         }
         return film;
     }
 
     public Film put (Film film) throws ValidationException {
         if (validationForFilm (film)) {
-            filmStorage.updateFilm (film);
+            filmStorage.update (film);
         }
         return film;
     }
 
     public void deleteFilm (Film film) throws NotFoundException {
-        filmStorage.deleteFilm (film.getId ());
+        filmStorage.delete (film.getId ());
     }
 
     public void addLike (int userId, int filmId) throws NotFoundException {

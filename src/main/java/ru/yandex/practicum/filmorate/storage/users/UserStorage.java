@@ -9,11 +9,11 @@ import java.util.List;
 @Component
 public interface UserStorage {
 
-    void createUser (User user);
+    void create (User user);
 
-    void updateUser (User user) throws NotFoundException;
+    void update (User user) throws NotFoundException;
 
-    void deleteUser (int id) throws NotFoundException;
+    void delete (int id) throws NotFoundException;
 
     List<User> getUsers ();
 

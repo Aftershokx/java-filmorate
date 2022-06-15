@@ -9,11 +9,11 @@ import java.util.List;
 @Component
 public interface FilmStorage {
 
-    void createFilm (Film film) throws RuntimeException;
+    void create (Film film) throws RuntimeException;
 
-    void updateFilm (Film film) throws NotFoundException;
+    void update (Film film) throws NotFoundException;
 
-    void deleteFilm (int id) throws RuntimeException;
+    void delete (int id) throws RuntimeException;
 
     List<Film> getFilms() throws RuntimeException;
 
