@@ -7,6 +7,8 @@ import ru.yandex.practicum.filmorate.validators.LocalDateCheck;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 public class Film {
@@ -19,5 +21,5 @@ public class Film {
     private LocalDate releaseDate;
     @Min(value = 0, message = "Продолжительность должна иметь положительное значение")
     private long duration;
-
+    private Set<Integer> likes = new HashSet<> ();
 }
