@@ -38,7 +38,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     public User getUserById (@PathVariable int id) throws NotFoundException {
-        return userService.getUserById (id);
+        return userService.getWithId (id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
@@ -48,26 +48,43 @@ public class UserController {
 
     @PostMapping
     public User create (@Valid @RequestBody User user) throws ValidationException {
-        return userService.create (user);
+        if (userService.validation (user)) {
+            userService.create (user);
+        }
+        return user;
     }
 
     @PutMapping
     public User put (@Valid @RequestBody User user) throws ValidationException {
-        return userService.put (user);
+        if (userService.validation (user)) {
+            userService.put (user);
+        }
+        return user;
     }
 
     @PutMapping("/{id}/friends/{friendId}")
     public void addFriend (@NotBlank @PathVariable int id, @NotBlank @PathVariable int friendId) throws NotFoundException {
-        userService.addFriend (id, friendId);
+        if (!(id == friendId)
+                && userService.getAllUsersID ().contains (id)
+                && userService.getAllUsersID ().contains (friendId)) {
+            userService.addFriend (id, friendId);
+        } else {
+            throw new NotFoundException ("Указан несуществующий ID");
+        }
     }
 
     @DeleteMapping
     public void remove (@Valid @RequestBody User user) throws NotFoundException {
-        userService.removeUser (user);
+        userService.delete (user);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
     public void removeFriend (@PathVariable int id, @PathVariable int friendId) throws RuntimeException {
-        userService.removeFriend (id, friendId);
+        if (userService.getWithId (id).getFriends ().contains (friendId)
+                && userService.getWithId (friendId).getFriends ().contains (id)) {
+            userService.removeFriend (id, friendId);
+        } else {
+            throw new ValidationException ("Указан несуществующий друг");
+        }
     }
 }

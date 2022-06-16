@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -18,10 +19,12 @@ import java.util.List;
 public class FilmController {
 
     private final FilmService filmService;
+    private final UserService userService;
 
     @Autowired
-    public FilmController (FilmService filmService) {
+    public FilmController (FilmService filmService, UserService userService) {
         this.filmService = filmService;
+        this.userService = userService;
     }
 
     @GetMapping
@@ -31,7 +34,7 @@ public class FilmController {
 
     @GetMapping("/{id}")
     public Film getFilmWithId (@PathVariable int id) throws RuntimeException {
-        return filmService.getFilmById (id);
+        return filmService.getWithId (id);
     }
 
     @GetMapping("/popular")
@@ -41,26 +44,37 @@ public class FilmController {
 
     @PostMapping
     public Film create (@Valid @RequestBody Film film) throws ValidationException {
-        return filmService.create (film);
+        if (filmService.validation (film)) {
+            filmService.create (film);
+        }
+        return film;
     }
 
     @DeleteMapping
     public void delete (@Valid @RequestBody Film film) throws RuntimeException {
-        filmService.deleteFilm (film);
+        filmService.delete (film);
     }
 
     @DeleteMapping("/{filmId}/like/{userId}")
     public void removeLike (@PathVariable int filmId, @PathVariable int userId) throws NotFoundException {
+        if (!userService.getAllUsersID ().contains (userId)) {
+            throw new NotFoundException ("Произошла ошибка, пользователь с Ид " + userId + " не найден");
+        }
         filmService.removeLike (filmId, userId);
     }
 
     @PutMapping
     public Film put (@Valid @RequestBody Film film) throws ValidationException {
-        return filmService.put (film);
+        if (filmService.validation (film)) {
+            filmService.put (film);
+        }
+        return film;
     }
 
     @PutMapping("/{id}/like/{userId}")
     public void addLike (@PathVariable int id, @PathVariable int userId) throws RuntimeException {
-        filmService.addLike (id, userId);
+        if (filmService.getWithId (id) != null || userService.getWithId (userId) != null) {
+            filmService.addLike (id, userId);
+        }
     }
 }

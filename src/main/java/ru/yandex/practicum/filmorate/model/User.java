@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Data;
+import lombok.*;
 import ru.yandex.practicum.filmorate.validators.LoginCheck;
 
 import javax.validation.constraints.Email;
@@ -10,7 +10,11 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
+@NoArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString
 public class User {
     private int id;
     @NotBlank(message = "Электронная почта не может быть пустой")

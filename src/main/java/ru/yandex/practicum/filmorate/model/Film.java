@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Data;
+import lombok.*;
 import org.hibernate.validator.constraints.Length;
 import ru.yandex.practicum.filmorate.validators.LocalDateCheck;
 
@@ -10,7 +10,11 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
+@NoArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString
 public class Film {
     private int id;
     @NotBlank(message = "Строка имени не должна быть пустой")
