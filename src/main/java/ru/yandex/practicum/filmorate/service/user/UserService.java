@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.service;
+package ru.yandex.practicum.filmorate.service.user;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.users.UserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import java.util.List;
 
 @Service
 @Slf4j
-public class UserService implements FilmAndUserService<User> {
+public class UserService implements UserServiceInterface {
 
     private final UserStorage userStorage;
 
@@ -65,20 +65,24 @@ public class UserService implements FilmAndUserService<User> {
         return true;
     }
 
+    @Override
     public List<Integer> getAllUsersID () {
         return userStorage.getAllUsersId ();
     }
 
+    @Override
     public void addFriend (int id, int friendId) throws NotFoundException {
         userStorage.getUserWithId (id).getFriends ().add (friendId);
         userStorage.getUserWithId (friendId).getFriends ().add (id);
     }
 
+    @Override
     public void removeFriend (int id, int friendId) throws ValidationException, NotFoundException {
         userStorage.getUserWithId (id).getFriends ().remove (friendId);
         userStorage.getUserWithId (friendId).getFriends ().remove (id);
     }
 
+    @Override
     public List<User> getAllFriends (int id) throws NotFoundException {
         List<User> friendsList = new ArrayList<> ();
         for (Integer friend : userStorage.getUserWithId (id).getFriends ()) {
@@ -87,6 +91,7 @@ public class UserService implements FilmAndUserService<User> {
         return friendsList;
     }
 
+    @Override
     public List<User> allCommonFriends (int id, int otherId) throws NotFoundException {
         List<User> commonFriends = new ArrayList<> ();
         for (Integer friend : userStorage.getUserWithId (id).getFriends ()) {

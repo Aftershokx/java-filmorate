@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.service;
+package ru.yandex.practicum.filmorate.service.film;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.films.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-public class FilmService implements FilmAndUserService<Film> {
+public class FilmService implements FilmServiceInterface {
 
     private final FilmStorage filmStorage;
 
@@ -66,14 +66,17 @@ public class FilmService implements FilmAndUserService<Film> {
         return true;
     }
 
+    @Override
     public void addLike (int userId, int filmId) throws NotFoundException {
         filmStorage.getFilmWithId (filmId).getLikes ().add (userId);
     }
 
+    @Override
     public void removeLike (int filmId, int userId) throws NotFoundException {
         filmStorage.getFilmWithId (filmId).getLikes ().remove (userId);
     }
 
+    @Override
     public List<Film> getPopularFilms (Integer count) {
         if (count == null) {
             count = 10;
