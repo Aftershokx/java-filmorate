@@ -1,106 +1,34 @@
 package ru.yandex.practicum.filmorate.service.user;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-@Service
-@Slf4j
-public class UserService implements UserServiceInterface {
+public interface UserService {
 
-    private final UserStorage userStorage;
+    User create (User user) throws ValidationException;
 
-    @Autowired
-    public UserService (UserStorage userStorage) {
-        this.userStorage = userStorage;
-    }
+    User put (User user) throws ValidationException;
 
-    @Override
-    public Collection<User> findAll () {
-        return userStorage.getUsers ();
-    }
+    void delete (User user) throws NotFoundException;
 
-    @Override
-    public User create (User user) throws ValidationException {
-        userStorage.create (user);
-        return user;
-    }
+    Collection<User> findAll ();
 
-    @Override
-    public User put (User user) throws ValidationException {
-        userStorage.update (user);
-        return user;
-    }
+    User getWithId (int id) throws NotFoundException;
 
-    @Override
-    public void delete (User user) throws NotFoundException {
-        userStorage.delete (user.getId ());
-    }
+    boolean validation (User user);
 
-    @Override
-    public User getWithId (int id) throws NotFoundException {
-        return userStorage.getUserWithId (id);
-    }
+    List<Integer> getAllUsersID ();
 
-    @Override
-    public boolean validation (User user) {
-        if (user.getEmail ().isBlank () || user.getEmail ().isEmpty () || !user.getEmail ().contains ("@")) {
-            throw new ValidationException ("Электронная почта не может быть пустой и должна содержать символ @");
-        } else if (user.getLogin ().isBlank () || user.getLogin ().isEmpty () || user.getLogin ().contains (" ")) {
-            throw new ValidationException ("Логин не может быть пустым и содержать пробелы");
-        } else if (user.getBirthday ().isAfter (LocalDate.now ())) {
-            throw new ValidationException ("Дата рождения не может быть в будущем");
-        } else if (user.getName ().isEmpty () || user.getName ().isBlank ()) {
-            user.setName (user.getLogin ());
-        }
-        return true;
-    }
+    void addFriend (int id, int friendId) throws NotFoundException;
 
-    @Override
-    public List<Integer> getAllUsersID () {
-        return userStorage.getAllUsersId ();
-    }
+    void removeFriend (int id, int friendId) throws ValidationException, NotFoundException;
 
-    @Override
-    public void addFriend (int id, int friendId) throws NotFoundException {
-        userStorage.getUserWithId (id).getFriends ().add (friendId);
-        userStorage.getUserWithId (friendId).getFriends ().add (id);
-    }
+    List<User> getAllFriends (int id) throws NotFoundException;
 
-    @Override
-    public void removeFriend (int id, int friendId) throws ValidationException, NotFoundException {
-        userStorage.getUserWithId (id).getFriends ().remove (friendId);
-        userStorage.getUserWithId (friendId).getFriends ().remove (id);
-    }
-
-    @Override
-    public List<User> getAllFriends (int id) throws NotFoundException {
-        List<User> friendsList = new ArrayList<> ();
-        for (Integer friend : userStorage.getUserWithId (id).getFriends ()) {
-            friendsList.add (userStorage.getUserWithId (friend));
-        }
-        return friendsList;
-    }
-
-    @Override
-    public List<User> allCommonFriends (int id, int otherId) throws NotFoundException {
-        List<User> commonFriends = new ArrayList<> ();
-        for (Integer friend : userStorage.getUserWithId (id).getFriends ()) {
-            if (userStorage.getUserWithId (otherId).getFriends ().contains (friend)) {
-                commonFriends.add (userStorage.getUserWithId (friend));
-            }
-        }
-        return commonFriends;
-    }
-
+    List<User> allCommonFriends (int id, int otherId) throws NotFoundException;
 
 }
