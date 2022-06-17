@@ -1,65 +1,90 @@
 package ru.yandex.practicum.filmorate.controllers;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.utility.IdUpdater;
+import ru.yandex.practicum.filmorate.service.user.UserService;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
+import javax.validation.constraints.NotBlank;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 
 @RestController
 @RequestMapping("/users")
 @Slf4j
 public class UserController {
-    private final Map<Integer, User> users = new HashMap<> ();
-    private final IdUpdater idUpdater = new IdUpdater ();
+
+    private final UserService userService;
+
+    @Autowired
+    public UserController (UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping
     public Collection<User> findAll () {
-        return users.values ();
+        return userService.findAll ();
+    }
+
+    @GetMapping("/{id}/friends")
+    public List<User> getAllFriends (@PathVariable int id) throws RuntimeException {
+        return userService.getAllFriends (id);
+    }
+
+    @GetMapping("/{id}")
+    public User getUserById (@PathVariable int id) throws NotFoundException {
+        return userService.getWithId (id);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<User> allCommonFriends (@PathVariable int id, @PathVariable int otherId) throws RuntimeException {
+        return userService.allCommonFriends (id, otherId);
     }
 
     @PostMapping
     public User create (@Valid @RequestBody User user) throws ValidationException {
-        validationForUser (user);
-        if (users.containsKey (user.getId ())) {
-            throw new ValidationException
-                    ("Произошла ошибка при создании пользователя, пользователь с таким ИД уже существует");
+        if (userService.validation (user)) {
+            userService.create (user);
         }
-        user.setId (idUpdater.updateId (user.getId (), users.keySet ()));
-        users.put (user.getId (), user);
-        log.info ("Пользователь " + user + " Успешно добавлен");
         return user;
     }
 
     @PutMapping
     public User put (@Valid @RequestBody User user) throws ValidationException {
-        validationForUser (user);
-        if (!users.containsKey (user.getId ())) {
-            throw new ValidationException
-                    ("Произошла ошибка при обновлении пользователя, пользователь с таким ИД не существует");
+        if (userService.validation (user)) {
+            userService.put (user);
         }
-        users.put (user.getId (), user);
-        log.info ("Пользователь " + user + " Успешно обновлен");
         return user;
     }
 
-    private void validationForUser (User user) {
-        if (user.getEmail ().isBlank () || user.getEmail ().isEmpty () || !user.getEmail ().contains ("@")) {
-            throw new ValidationException ("Электронная почта не может быть пустой и должна содержать символ @");
-        } else if (user.getLogin ().isBlank () || user.getLogin ().isEmpty () || user.getLogin ().contains (" ")) {
-            throw new ValidationException ("Логин не может быть пустым и содержать пробелы");
-        } else if (user.getBirthday ().isAfter (LocalDate.now ())) {
-            throw new ValidationException ("Дата рождения не может быть в будущем");
-        } else if (user.getName ().isEmpty () || user.getName ().isBlank ()) {
-            user.setName (user.getLogin ());
+    @PutMapping("/{id}/friends/{friendId}")
+    public void addFriend (@NotBlank @PathVariable int id, @NotBlank @PathVariable int friendId) throws NotFoundException {
+        if (!(id == friendId)
+                && userService.getAllUsersID ().contains (id)
+                && userService.getAllUsersID ().contains (friendId)) {
+            userService.addFriend (id, friendId);
+        } else {
+            throw new NotFoundException ("Указан несуществующий ID");
         }
     }
 
+    @DeleteMapping
+    public void remove (@Valid @RequestBody User user) throws NotFoundException {
+        userService.delete (user);
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public void removeFriend (@PathVariable int id, @PathVariable int friendId) throws RuntimeException {
+        if (userService.getWithId (id).getFriends ().contains (friendId)
+                && userService.getWithId (friendId).getFriends ().contains (id)) {
+            userService.removeFriend (id, friendId);
+        } else {
+            throw new ValidationException ("Указан несуществующий друг");
+        }
+    }
 }

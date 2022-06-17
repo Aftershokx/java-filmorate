@@ -10,6 +10,7 @@ import java.util.Set;
 @Getter
 @Setter
 public class IdUpdater {
+
     private int uniId;
 
     public int updateId (int id, Set<Integer> existedIds) {
