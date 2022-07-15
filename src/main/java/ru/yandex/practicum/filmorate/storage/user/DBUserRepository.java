@@ -10,6 +10,7 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.model.Friendship;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.*;
@@ -29,6 +30,16 @@ public class DBUserRepository implements UserStorage {
     @Autowired
     public DBUserRepository (JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+    }
+
+    static User makeUser (ResultSet rs, int rowNum) throws SQLException {
+        User user = new User ();
+        user.setId (rs.getInt ("USER_ID"));
+        user.setEmail (rs.getString ("EMAIL"));
+        user.setLogin (rs.getString ("LOGIN"));
+        user.setName (rs.getString ("USER_NAME"));
+        user.setBirthday (rs.getDate ("BIRTHDAY").toLocalDate ());
+        return user;
     }
 
     @Override
@@ -120,7 +131,6 @@ public class DBUserRepository implements UserStorage {
         return jdbcTemplate.query (sql, DBUserRepository::makeUser, id);
     }
 
-
     @Override
     public List<User> getUserCrossFriends (int id, int otherId) {
         final String sql = "SELECT * FROM USERS WHERE USER_ID IN (SELECT FRIEND_ID " +
@@ -133,14 +143,27 @@ public class DBUserRepository implements UserStorage {
     private void deleteFriends (User user) {
         final String sql = "DELETE FROM FRIENDS where USER_ID = ?";
         jdbcTemplate.update (sql, user.getId ());
+        setFriendshipStatus ();
     }
 
+    private void setFriendshipStatus () {
+        final String sql = "SELECT * FROM FRIENDS";
+        List<Integer> userIds = jdbcTemplate.query (sql, (rs, rowNum) ->
+                rs.getInt ("USER_ID"));
+        List<Integer> friendsIds = jdbcTemplate.query (sql, (rs, rowNum) ->
+                rs.getInt ("FRIEND_ID"));
+        List<Integer> crossFriends = Friendship.findCrossings (userIds, friendsIds);
+        final String updateSql = "UPDATE FRIENDS SET STATUS_ID = 1 WHERE USER_ID = ?";
+        for (Integer crossFriend : crossFriends) {
+            jdbcTemplate.update (updateSql, crossFriend);
+        }
+    }
 
     private void insertFriends (User user) {
         if (user.getFriends ().isEmpty ()) {
             return;
         }
-        String sql = "INSERT INTO FRIENDS (FRIEND_ID, USER_ID) values (?, ?)";
+        String sql = "INSERT INTO FRIENDS (FRIEND_ID, USER_ID, STATUS_ID) values (?, ?, ?)";
 
         try (PreparedStatement ps = Objects.requireNonNull (jdbcTemplate.getDataSource ()).
                 getConnection ().
@@ -148,21 +171,13 @@ public class DBUserRepository implements UserStorage {
             for (Integer friend : user.getFriends ()) {
                 ps.setInt (1, friend);
                 ps.setInt (2, user.getId ());
+                ps.setInt (3, 2);
                 ps.addBatch ();
                 ps.executeUpdate ();
             }
         } catch (SQLException e) {
             e.printStackTrace ();
         }
-    }
-
-    static User makeUser (ResultSet rs, int rowNum) throws SQLException {
-        User user = new User ();
-        user.setId (rs.getInt ("USER_ID"));
-        user.setEmail (rs.getString ("EMAIL"));
-        user.setLogin (rs.getString ("LOGIN"));
-        user.setName (rs.getString ("USER_NAME"));
-        user.setBirthday (rs.getDate ("BIRTHDAY").toLocalDate ());
-        return user;
+        setFriendshipStatus ();
     }
 }

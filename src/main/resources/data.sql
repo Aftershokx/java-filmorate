@@ -14,5 +14,5 @@ MERGE INTO GENRES (GENRE_ID, GENRE_NAME)
            (6, 'Боевик');
 
 MERGE INTO FRIENDSHIP_STATUSES (STATUS_ID, STATUS)
-    VALUES (1, 'True'),
-           (2, 'False');
+    VALUES (1, 'Confirmed'),
+           (2, 'Not_Confirmed');
