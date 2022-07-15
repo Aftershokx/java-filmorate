@@ -10,9 +10,7 @@ import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -67,13 +65,18 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
-    public void addLike (int userId, int filmId) throws NotFoundException {
-        filmStorage.getFilmWithId (filmId).getLikes ().add (userId);
+    public void addLike (int filmId, int userId) throws NotFoundException {
+        Film film = filmStorage.getFilmWithId (filmId);
+        film.getLikes ().add (userId);
+        filmStorage.insertLikes (film);
+
     }
 
     @Override
     public void removeLike (int filmId, int userId) throws NotFoundException {
-        filmStorage.getFilmWithId (filmId).getLikes ().remove (userId);
+        Film film = filmStorage.getFilmWithId (filmId);
+        film.getLikes ().remove (userId);
+        filmStorage.deleteLike (filmId, userId);
     }
 
     @Override
@@ -81,11 +84,7 @@ public class FilmServiceImpl implements FilmService {
         if (count == null) {
             count = 10;
         }
-        return filmStorage.getFilms ()
-                .stream ()
-                .sorted (Comparator.comparingInt (film -> film.getLikes ().size ()))
-                .limit (count)
-                .collect (Collectors.toList ());
+        return filmStorage.getMostPopular (count);
     }
 
 }

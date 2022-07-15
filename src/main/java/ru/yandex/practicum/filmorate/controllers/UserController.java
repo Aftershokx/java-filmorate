@@ -57,7 +57,7 @@ public class UserController {
     @PutMapping
     public User put (@Valid @RequestBody User user) throws ValidationException {
         if (userService.validation (user)) {
-            userService.put (user);
+            user = userService.put (user);
         }
         return user;
     }
@@ -80,8 +80,7 @@ public class UserController {
 
     @DeleteMapping("/{id}/friends/{friendId}")
     public void removeFriend (@PathVariable int id, @PathVariable int friendId) throws RuntimeException {
-        if (userService.getWithId (id).getFriends ().contains (friendId)
-                && userService.getWithId (friendId).getFriends ().contains (id)) {
+        if (userService.getWithId (id).getFriends ().contains (friendId)) {
             userService.removeFriend (id, friendId);
         } else {
             throw new ValidationException ("Указан несуществующий друг");

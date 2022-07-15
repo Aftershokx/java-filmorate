@@ -9,22 +9,22 @@ import java.util.List;
 
 public interface FilmService {
 
-     Film create (Film film) throws ValidationException;
+    Film create (Film film) throws ValidationException;
 
-     Film put (Film film) throws ValidationException;
+    Film put (Film film) throws ValidationException;
 
-     void delete (Film film) throws NotFoundException;
+    void delete (Film film) throws NotFoundException;
 
-     Collection<Film> findAll ();
+    Collection<Film> findAll ();
 
-     Film getWithId (int id) throws NotFoundException;
+    Film getWithId (int id) throws NotFoundException;
 
-     boolean validation (Film film);
+    boolean validation (Film film);
 
-     void addLike (int userId, int filmId) throws NotFoundException;
+    void addLike (int userId, int filmId) throws NotFoundException;
 
-     void removeLike (int filmId, int userId) throws NotFoundException;
+    void removeLike (int filmId, int userId) throws NotFoundException;
 
-     List<Film> getPopularFilms (Integer count);
+    List<Film> getPopularFilms (Integer count);
 
 }

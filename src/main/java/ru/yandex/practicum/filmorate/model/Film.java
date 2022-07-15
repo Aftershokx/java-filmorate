@@ -6,11 +6,14 @@ import ru.yandex.practicum.filmorate.validators.LocalDateCheck;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 @EqualsAndHashCode
@@ -26,4 +29,7 @@ public class Film {
     @Min(value = 0, message = "Продолжительность должна иметь положительное значение")
     private long duration;
     private Set<Integer> likes = new HashSet<> ();
+    private List<Genre> genres;
+    @NotNull
+    private Mpa mpa;
 }

@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -72,34 +71,26 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void addFriend (int id, int friendId) throws NotFoundException {
-        userStorage.getUserWithId (id).getFriends ().add (friendId);
-        userStorage.getUserWithId (friendId).getFriends ().add (id);
+        User user = userStorage.getUserWithId (id);
+        user.getFriends ().add (friendId);
+        userStorage.update (user);
     }
 
     @Override
     public void removeFriend (int id, int friendId) throws ValidationException, NotFoundException {
-        userStorage.getUserWithId (id).getFriends ().remove (friendId);
-        userStorage.getUserWithId (friendId).getFriends ().remove (id);
+        User user = userStorage.getUserWithId (id);
+        user.getFriends ().remove (friendId);
+        userStorage.update (user);
     }
 
     @Override
     public List<User> getAllFriends (int id) throws NotFoundException {
-        List<User> friendsList = new ArrayList<> ();
-        for (Integer friend : userStorage.getUserWithId (id).getFriends ()) {
-            friendsList.add (userStorage.getUserWithId (friend));
-        }
-        return friendsList;
+        return userStorage.getUserFriends (id);
     }
 
     @Override
     public List<User> allCommonFriends (int id, int otherId) throws NotFoundException {
-        List<User> commonFriends = new ArrayList<> ();
-        for (Integer friend : userStorage.getUserWithId (id).getFriends ()) {
-            if (userStorage.getUserWithId (otherId).getFriends ().contains (friend)) {
-                commonFriends.add (userStorage.getUserWithId (friend));
-            }
-        }
-        return commonFriends;
+        return userStorage.getUserCrossFriends (id, otherId);
     }
 
 
