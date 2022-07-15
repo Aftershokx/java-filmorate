@@ -12,3 +12,7 @@ MERGE INTO GENRES (GENRE_ID, GENRE_NAME)
            (4, 'Триллер'),
            (5, 'Документальный'),
            (6, 'Боевик');
+
+MERGE INTO FRIENDSHIP_STATUSES (STATUS_ID, STATUS)
+    VALUES (1, 'True'),
+           (2, 'False');
