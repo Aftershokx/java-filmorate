@@ -12,12 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
-@EqualsAndHashCode
-@ToString
+@Data
 public class Film {
     private int id;
     @NotBlank(message = "Строка имени не должна быть пустой")

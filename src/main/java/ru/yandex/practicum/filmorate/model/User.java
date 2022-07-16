@@ -10,11 +10,7 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-@NoArgsConstructor
-@Getter
-@Setter
-@EqualsAndHashCode
-@ToString
+@Data
 public class User {
     private int id;
     @NotBlank(message = "Электронная почта не может быть пустой")
